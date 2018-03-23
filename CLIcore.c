@@ -4,7 +4,7 @@
  * @brief main C file
  * 
  * Contains main()
- * 
+ * This is an OS X Sierra compatible version  - TC, 03/23/2018
  * @author Olivier Guyon
  * @date Aug 2 2017
  */
@@ -45,7 +45,7 @@
 
 //#include <pthread_np.h>
 
-#ifdef __MACH__
+/*#ifdef __MACH__
 #include <mach/mach_time.h>
 #define CLOCK_REALTIME 0
 #define CLOCK_MONOTONIC 0
@@ -60,9 +60,9 @@ static int clock_gettime(int clk_id, struct mach_timespec *t){
     t->tv_nsec = nseconds;
     return 0;
 }
-#else
+#else*/
 #include <sys/time.h>
-#endif
+//#endif
 
 
 #include <math.h>
