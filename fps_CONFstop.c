@@ -7,10 +7,11 @@
 
 #include "CommandLineInterface/CLIcore.h"
 
+#include "function_parameters.h"
 
 
 /** @brief FPS stop CONF process
- * 
+ *
  */
 errno_t functionparameter_CONFstop(
     FUNCTION_PARAMETER_STRUCT *fps

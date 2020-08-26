@@ -56,6 +56,7 @@ typedef long variableID;
 
 #ifndef STANDALONE
 #include "config.h"
+#endif
 
 #include "ImageStreamIO/ImageStreamIO.h"
 #include "ImageStreamIO/ImageStruct.h"
@@ -65,7 +66,6 @@ typedef long variableID;
 #include "CommandLineInterface/processtools.h"
 #include "CommandLineInterface/streamCTRL.h"
 #include "CommandLineInterface/function_parameters.h"
-#endif
 
 
 #define PI 3.14159265358979323846264338328
@@ -80,8 +80,8 @@ typedef long variableID;
 #define STRINGMAXLEN_STREAMNAME     100
 #define STRINGMAXLEN_IMGNAME        100
 #define STRINGMAXLEN_FILENAME       200  // without directory, includes extension
-#define STRINGMAXLEN_DIRNAME        800 
-#define STRINGMAXLEN_FULLFILENAME  1000  // includes directory name 
+#define STRINGMAXLEN_DIRNAME        800
+#define STRINGMAXLEN_FULLFILENAME  1000  // includes directory name
 #define STRINGMAXLEN_FUNCTIONNAME   200
 #define STRINGMAXLEN_FUNCTIONARGS  1000
 #define STRINGMAXLEN_SHMDIRNAME     200
@@ -255,6 +255,7 @@ write_process_log();                                 \
  * @brief system call with error checking and handling
  *
  */
+#ifndef STANDALONE
 #define EXECUTE_SYSTEM_COMMAND(...) do {                                   \
 char syscommandstring[STRINGMAXLEN_COMMAND];                               \
 int slen = snprintf(syscommandstring, STRINGMAXLEN_COMMAND, __VA_ARGS__);  \
@@ -268,7 +269,20 @@ if(slen >= STRINGMAXLEN_COMMAND) {                                         \
 }                                                                          \
 data.retvalue = system(syscommandstring);                                  \
 } while(0)
-
+#else
+#define EXECUTE_SYSTEM_COMMAND(...) do {                                   \
+char syscommandstring[STRINGMAXLEN_COMMAND];                               \
+int slen = snprintf(syscommandstring, STRINGMAXLEN_COMMAND, __VA_ARGS__);  \
+if(slen<1) {                                                               \
+    PRINT_ERROR("snprintf wrote <1 char");                                 \
+    abort();                                                               \
+}                                                                          \
+if(slen >= STRINGMAXLEN_COMMAND) {                                         \
+    PRINT_ERROR("snprintf string truncation");                             \
+    abort();                                                               \
+}                                                                          \
+} while(0)
+#endif
 
 
 /**
@@ -533,7 +547,7 @@ typedef struct
     char     module[200];        // module name
 	// index of module to which command belongs
 	// set to -1 if does not belong to any module
-    long     moduleindex;        
+    long     moduleindex;
     char     modulesrc[200];     // module source filename
     errno_t (* fp)();            // command function pointer
     char     info[1000];         // short description/help
@@ -656,7 +670,7 @@ typedef struct
 	// =================================================
 
     struct sigaction sigact;
-  
+
     int signal_USR1;
     int signal_USR2;
     int signal_TERM;
@@ -672,7 +686,7 @@ typedef struct
 	// TEST POINTS
 	// =================================================
     // can be used to trace program execution for runtime profiling and debugging
-    
+
     int    testpoint_line;
     char   testpoint_file[STRINGMAXLEN_FILENAME];
     char   testpoint_func[STRINGMAXLEN_FUNCTIONNAME];
@@ -680,8 +694,8 @@ typedef struct
     struct timespec testpoint_time;
 
 
-    
-    
+
+
     int progStatus;  // main program status
     // 0: before automatic loading of shared objects
     // 1: after automatic loading of shared objects
@@ -689,7 +703,7 @@ typedef struct
 
 	// REAL-TIME PRIO
 	// =================================================
-	
+
     uid_t ruid; // Real UID (= user launching process at startup)
     uid_t euid; // Effective UID (= owner of executable at startup)
     uid_t suid; // Saved UID (= owner of executable at startup)
@@ -702,7 +716,7 @@ typedef struct
 
 	// OPERATION MODE
 	// =================================================
-	
+
     int            Debug;
     int            quiet;
     int            overwrite;		// automatically overwrite FITS files
@@ -775,7 +789,7 @@ typedef struct
 	// array of FPSs
 	long           NB_MAX_FPS;
 	FUNCTION_PARAMETER_STRUCT *fps;
-	
+
 
     // Function parameter structure (FPS) CLI integration
     // These entries are set when CLI process links to FPS
@@ -787,7 +801,7 @@ typedef struct
     uint32_t       FPS_CMDCODE;       // current FPS mode
     errno_t        (*FPS_CONFfunc)(); // pointer to FPS conf function
     errno_t        (*FPS_RUNfunc)();  // pointer to FPS run function
-	
+
 
 
 
@@ -811,7 +825,7 @@ typedef struct
 
 
 
-    // VARIABLES 
+    // VARIABLES
     // =================================================
 
     long           NB_MAX_VARIABLE;
@@ -824,8 +838,8 @@ typedef struct
 
 
 
-	
-	
+
+
 	// CONVENIENCE STORAGE
 	// =================================================
     float          FLOATARRAY[1000];	// array to store temporary variables
@@ -834,7 +848,7 @@ typedef struct
 
 	// gen purpose return value
 	// used for system commands
-	int            retvalue; 
+	int            retvalue;
 
     // status counter (used for profiling)
     int            status0;
@@ -862,7 +876,7 @@ errno_t RegisterModule(
     const char *restrict InfoString,
     int versionmajor,
     int versionminor,
-    int versionpatch    
+    int versionpatch
 );
 
 uint32_t RegisterCLIcommand(

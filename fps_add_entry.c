@@ -6,10 +6,9 @@
 
 
 
-
 #include "CommandLineInterface/CLIcore.h"
 
-
+#include "function_parameters.h"
 
 /** @brief Add parameter to database with default settings
  *
@@ -625,6 +624,3 @@ int function_parameter_add_entry(
 
     return pindex;
 }
-
-
-

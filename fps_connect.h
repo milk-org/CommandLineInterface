@@ -3,6 +3,7 @@
  * @brief   connect to FPS
  */
 
+#include "function_parameters.h"
 
 #ifndef FPS_CONNECT_H
 #define FPS_CONNECT_H

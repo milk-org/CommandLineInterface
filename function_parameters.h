@@ -313,7 +313,7 @@ typedef struct
     char description[FUNCTION_PARAMETER_DESCR_STRMAXLEN];
 
 	// one of FUNCTION_PARAMETER_TYPE_XXXX
-    uint32_t type;        
+    uint32_t type;
 
     union
     {
@@ -321,18 +321,18 @@ typedef struct
         int64_t l[4];
 
 		// value, min, max, current state (if different from request)
-        double f[4];          
+        double f[4];
         float  s[4];
-        
+
         // first value is set point, second is current state
         pid_t pid[2];
-        
+
         // first value is set point, second is current state
         struct timespec ts[2];
 
 		// first value is set point, second is current state
-        char string[2][FUNCTION_PARAMETER_STRMAXLEN]; 
-        
+        char string[2][FUNCTION_PARAMETER_STRMAXLEN];
+
         // if TYPE = PROCESS, string[0] is tmux session, string[1] is launch command
     } val;
 
@@ -379,7 +379,7 @@ typedef struct
 //#define FUNCTION_PARAMETER_STRUCT_SIGNAL_CONFSTOP   0x0002   // stop configuration process
 #define FUNCTION_PARAMETER_STRUCT_SIGNAL_UPDATE     0x0004   // re-run check of parameter
 
-#define FUNCTION_PARAMETER_STRUCT_SIGNAL_CHECKED    0x0008   // CheckParametersAll been completed. 
+#define FUNCTION_PARAMETER_STRUCT_SIGNAL_CHECKED    0x0008   // CheckParametersAll been completed.
 // Toggles to 1 upon update request
 // Toggles to 0 when update completed (in function CheckParametersAll)
 
@@ -420,16 +420,16 @@ typedef struct
     char                name[STRINGMAXLEN_FPS_NAME];         // example: pname-01-32
 
     char                description[FPS_DESCR_STRMAXLEN];
-    
-    
+
+
     // where should processes run from ?
     char                workdir[FPS_CWD_STRLENMAX];
-    
+
     // [output] where should configurations and results be written to ?
     char                datadir[FPS_DIR_STRLENMAX];
     // [input] directory for configuration
     char                confdir[FPS_DIR_STRLENMAX];
-    
+
     // source code file name
     char				sourcefname[FPS_SRCDIR_STRLENMAX];
     // souce code line
@@ -450,11 +450,11 @@ typedef struct
     // PID of process owning parameter structure configuration
     pid_t               confpid;
     struct timespec     confpidstarttime;
-    
+
     // PID of process running on this fps
     pid_t               runpid;
 	struct timespec     runpidstarttime;
-	
+
 
 
 
@@ -462,7 +462,7 @@ typedef struct
 
 	// Used to send signals to configuration process
     uint64_t            signal;
-    
+
     // configuration wait timer value [us]
     uint64_t            confwaitus;
 
@@ -493,7 +493,7 @@ typedef struct
 
 
 // localstatus flags
-// 
+//
 // run configuration loop
 #define FPS_LOCALSTATUS_CONFLOOP 0x0001
 
@@ -509,7 +509,7 @@ typedef struct
     uint16_t  localstatus;   // 1 if conf loop should be active
     int       SMfd;
     uint32_t  CMDmode;
-    
+
     long      NBparam;        // number of parameters in array
     long      NBparamActive;  // number of active parameters
 
@@ -528,8 +528,8 @@ typedef struct
 //
 
 // max number of entries in queues (total among all queues)
-#define NB_FPSCTRL_TASK_MAX             500    
-#define NB_FPSCTRL_TASK_PURGESIZE        50  
+#define NB_FPSCTRL_TASK_MAX             500
+#define NB_FPSCTRL_TASK_PURGESIZE        50
 
 // flags
 #define FPSTASK_STATUS_ACTIVE    0x0000000000000001   // is the task entry in the array used ?
@@ -653,27 +653,53 @@ typedef struct
 
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 
 #include "fps_add_entry.h"
 #include "fps_checkparameter.h"
-#include "fps_connect.h"
+#include "fps_CONFstart.h"
+#include "fps_CONFstop.h"
 #include "fps_connectExternalFPS.h"
+#include "fps_connect.h"
 #include "fps_CTRLscreen.h"
 #include "fps_disconnect.h"
 #include "fps_execFPScmd.h"
 #include "fps_FPCONFexit.h"
 #include "fps_FPCONFloopstep.h"
 #include "fps_FPCONFsetup.h"
+#include "fps_FPSremove.h"
+#include "fps_GetFileName.h"
 #include "fps_getFPSargs.h"
+#include "fps_GetParamIndex.h"
+#include "fps_GetTypeString.h"
 #include "fps_load.h"
+#include "fps_loadstream.h"
 #include "fps_outlog.h"
 #include "fps_paramvalue.h"
+#include "fps_PrintParameterInfo.h"
+#include "fps_printparameter_valuestring.h"
+#include "fps_processcmdline.h"
+#include "fps_process_fpsCMDarray.h"
 #include "fps_processinfo_entries.h"
+#include "fps_process_user_key.h"
+#include "fps_read_fpsCMD_fifo.h"
 #include "fps_RUNexit.h"
+#include "fps_RUNstart.h"
+#include "fps_RUNstop.h"
 #include "fps_save2disk.h"
+#include "fps_scan.h"
 #include "fps_shmdirname.h"
+#include "fps_tmux.h"
+#include "fps_userinputsetparamvalue.h"
 
+
+#ifdef __cplusplus
+}
+#endif
 
 
 
@@ -716,8 +742,8 @@ typedef struct
 
 
 /** @brief Connect to FPS
- * 
- * 
+ *
+ *
  */
 #define FPS_CONNECT( VARfpsname, VARCMDmode ) FUNCTION_PARAMETER_STRUCT fps; do { \
   fps.SMfd = -1; \
@@ -755,10 +781,10 @@ function_parameter_FPCONFexit(&fps);
 
 
 /** @brief Add 64-bit float parameter entry
- * 
+ *
  * Default setting for input parameter\n
  * Also creates function parameter index (fp_##key), type long
- * 
+ *
  * (void) statement suppresses compiler unused parameter warning
  */
 #define FPS_ADDPARAM_FLT32_IN(key, pname, pdescr, dflt) \

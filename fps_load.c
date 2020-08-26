@@ -6,7 +6,9 @@
 
 
 #include "CommandLineInterface/CLIcore.h"
+#ifndef STANDALONE
 #include "COREMOD_memory/COREMOD_memory.h"
+#endif  // STANDALONE
 
 #include "fps_connect.h"
 
@@ -16,14 +18,14 @@ long function_parameter_structure_load(
     char *fpsname
 )
 {
-    long fpsID;
+    long fpsID = -1;
 
 
     DEBUG_TRACEPOINT("loading FPS %s", fpsname);
 
+#ifndef STANDALONE
     fpsID = fps_ID(fpsname);
-    
-    
+
     if(fpsID == -1)
     {
         // not found, searching
@@ -68,7 +70,10 @@ long function_parameter_structure_load(
     {
 		printf("FPS already loaded at index %ld\n", fpsID);
 	}
+#else
+    printf("--- cannot load FPS %s in standalone\n", fpsname);
+
+#endif  // STANDALONE
 
     return fpsID;
 }
-

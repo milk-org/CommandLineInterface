@@ -6,7 +6,9 @@
 
 #include "CommandLineInterface/CLIcore.h"
 
+#ifndef STANDALONE
 #include "COREMOD_iofits/COREMOD_iofits.h"
+#endif  // STANDALONE
 
 
 imageID functionparameter_LoadStream(

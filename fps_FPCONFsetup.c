@@ -5,7 +5,12 @@
 
 
 #include "CommandLineInterface/CLIcore.h"
+
+#ifndef STANDALONE
 #include "COREMOD_memory/fps_create.h"
+#else
+#include "standalone_dependencies.h"
+#endif  // STANDALONE
 
 #include "fps_connect.h"
 #include "fps_disconnect.h"
@@ -14,7 +19,7 @@
 /** @brief FPS config setup
  *
  * called by conf and run functions
- * 
+ *
  */
 FUNCTION_PARAMETER_STRUCT function_parameter_FPCONFsetup(
     const char *fpsname,
@@ -32,15 +37,17 @@ FUNCTION_PARAMETER_STRUCT function_parameter_FPCONFsetup(
     // record timestamp
     struct timespec tnow;
     clock_gettime(CLOCK_REALTIME, &tnow);
+
+#ifndef STANDALONE
     data.FPS_TIMESTAMP = tnow.tv_sec;
 
     strcpy(data.FPS_PROCESS_TYPE, "UNDEF");
 //	char ptstring[STRINGMAXLEN_FPSPROCESSTYPE];
-	
+
     switch(CMDmode)
     {
         case FPSCMDCODE_CONFSTART:
-			snprintf(data.FPS_PROCESS_TYPE, STRINGMAXLEN_FPSPROCESSTYPE, "confstart-%s", fpsname);            
+			snprintf(data.FPS_PROCESS_TYPE, STRINGMAXLEN_FPSPROCESSTYPE, "confstart-%s", fpsname);
             break;
 
         case FPSCMDCODE_CONFSTOP:
@@ -74,6 +81,7 @@ FUNCTION_PARAMETER_STRUCT function_parameter_FPCONFsetup(
 
     }
 
+#endif  // STANDALONE
 
 
 
@@ -133,4 +141,3 @@ FUNCTION_PARAMETER_STRUCT function_parameter_FPCONFsetup(
 
     return fps;
 }
-

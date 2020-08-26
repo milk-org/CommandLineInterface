@@ -15,17 +15,19 @@
 
 
 /** @brief Get FPS log filename
- * 
+ *
  * logfname should be char [STRINGMAXLEN_FULLFILENAME]
- * 
+ *
  */
 errno_t getFPSlogfname(char *logfname)
 {
+#ifndef STANDALONE
 	char shmdname[STRINGMAXLEN_SHMDIRNAME];
-    function_parameter_struct_shmdirname(shmdname);   
-    
+    function_parameter_struct_shmdirname(shmdname);
+
     WRITE_FULLFILENAME(logfname, "%s/fpslog.%ld.%07d.%s", shmdname, data.FPS_TIMESTAMP, getpid(), data.FPS_PROCESS_TYPE);
-	
+#endif  // STANDALONE
+
 	return RETURN_SUCCESS;
 }
 
@@ -130,13 +132,13 @@ errno_t functionparameter_outlog(
     va_start(args, fmt);
 
     vfprintf(fpout, fmt, args);
-    
+
     fprintf(fpout, "\n");
-    
+
     fflush(fpout);
 
 	va_end(args);
-	
+
 
     if(strcmp(keyw, "LOGFILECLOSE") == 0)
     {
@@ -158,13 +160,15 @@ errno_t functionparameter_outlog(
  */
 errno_t functionparameter_outlog_namelink()
 {
+#ifndef STANDALONE
+
     char shmdname[STRINGMAXLEN_SHMDIRNAME];
-    function_parameter_struct_shmdirname(shmdname);   
-    
+    function_parameter_struct_shmdirname(shmdname);
+
     char logfname[STRINGMAXLEN_FULLFILENAME];
     getFPSlogfname(logfname);
-    
-    
+
+
     char linkfname[STRINGMAXLEN_FULLFILENAME];
     WRITE_FULLFILENAME(linkfname, "%s/fpslog.%s", shmdname,
                        data.FPS_PROCESS_TYPE);
@@ -172,13 +176,11 @@ errno_t functionparameter_outlog_namelink()
     if(symlink(logfname, linkfname) == -1)
     {
 		int errnum = errno;
-		fprintf(stderr, "Error symlink: %s\n", strerror( errnum ));	
+		fprintf(stderr, "Error symlink: %s\n", strerror( errnum ));
 		PRINT_ERROR("symlink error %s %s", logfname, linkfname);
 	}
 
+#endif  // STANDALONE
 
     return RETURN_SUCCESS;
 }
-
-
-

@@ -6,7 +6,11 @@
 
 
 #include "CommandLineInterface/CLIcore.h"
-#include "CommandLineInterface/timeutils.h"
+#ifndef STANDALONE
+#include "COREMOD_tools/timeutils.h"
+#else
+#include "standalone_dependencies.h"
+#endif  // STANDALONE
 
 #include "fps_GetParamIndex.h"
 
@@ -86,4 +90,3 @@ errno_t functionparameter_RUNstart(
     }
     return RETURN_SUCCESS;
 }
-

@@ -10,9 +10,12 @@
 
 #include "CommandLineInterface/CLIcore.h"
 
+#ifndef STANDALONE
 #include "COREMOD_memory/COREMOD_memory.h"
 #include "COREMOD_iofits/COREMOD_iofits.h"
+#endif
 
+#include "function_parameters.h"
 #include "fps_connect.h"
 #include "fps_disconnect.h"
 #include "fps_outlog.h"
@@ -490,10 +493,3 @@ int functionparameter_CheckParametersAll(
 
     return 0;
 }
-
-
-
-
-
-
-

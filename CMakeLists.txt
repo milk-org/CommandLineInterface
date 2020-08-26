@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.8)
 set(SRCNAME "CommandLineInterface")
 
 
-option(python_module "Compile Python Wrappers" OFF)
+option(build_python_module "Compile Python Wrappers" OFF)
 
 project(CLIcore C)
 
@@ -18,7 +18,7 @@ pkg_check_modules(HWLOC hwloc)
 
 
 
-if(${python_module})
+if(${build_python_module})
   set(CORE_FILES standalone_dependencies.c)
 else()
   include_directories("${PROJECT_SOURCE_DIR}/src")
@@ -94,19 +94,19 @@ add_library(CLIcore
             TUItools.c
             ${CORE_FILES})
 
-if(${python_module})
+if(${build_python_module})
   set(USE_CUDA ON)
   if(NOT TARGET ImageStreamIO)
-    if(IS_DIRECTORY ${PROJECT_SOURCE_DIR}/../ImageStreamIO)
-      add_subdirectory( ${PROJECT_SOURCE_DIR}/../ImageStreamIO ImageStreamIO)
+    if(IS_DIRECTORY ${PROJECT_SOURCE_DIR}/..)
+      add_subdirectory( ${PROJECT_SOURCE_DIR}/.. tplib)
     else()
-      add_subdirectory($ENV{OCTOPUS_ROOT}/tplib/ImageStreamIO ImageStreamIO)
+      add_subdirectory($ENV{OCTOPUS_ROOT}/tplib tplib)
     endif()
   endif()
   target_compile_definitions(CLIcore PUBLIC STANDALONE)
   target_include_directories(
     CLIcore
-    PUBLIC ${CUDA_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/../ImageStreamIO)
+    PUBLIC ${CUDA_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/..)
   target_link_libraries(CLIcore PUBLIC ImageStreamIO)
 else()
   target_include_directories(CLIcore
@@ -150,7 +150,7 @@ target_link_libraries(CLIcore
                       PUBLIC ${CMAKE_THREAD_LIBS_INIT} ${HWLOC_LIBRARIES}
                              ${NCURSES_LIBRARIES})
 
-if(${python_module})
+if(${build_python_module})
   add_subdirectory(python_module)
 endif()
 

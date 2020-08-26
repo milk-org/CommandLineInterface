@@ -11,7 +11,14 @@
 
 
 #include "CommandLineInterface/CLIcore.h"
-#include "CommandLineInterface/timeutils.h"
+
+#ifndef STANDALONE
+#include "COREMOD_tools/timeutils.h"
+#else
+#include "standalone_dependencies.h"
+#endif
+
+#include "function_parameters.h"
 #include "fps_shmdirname.h"
 #include "fps_loadstream.h"
 #include "fps_GetParamIndex.h"
@@ -97,7 +104,7 @@ long function_parameter_struct_connect(
     if(fpsconnectmode == FPSCONNECT_RUN)
     {
         fps->md->runpid = getpid();    // write process PID into FPS
-        clock_gettime(CLOCK_REALTIME, &fps->md->runpidstarttime);     
+        clock_gettime(CLOCK_REALTIME, &fps->md->runpidstarttime);
     }
 
 
@@ -163,9 +170,9 @@ long function_parameter_struct_connect(
 		}
 	}
 	fps->NBparamActive = pactivecnt;
-	
-        
-	
+
+
+
     //function_parameter_printlist(fps->parray, NBparamMAX);
 
 
@@ -183,8 +190,8 @@ long function_parameter_struct_connect(
             }
         }
     }
-    
-    
+
+
     // update time
     //
     if(fpsconnectmode == FPSCONNECT_RUN)
@@ -200,10 +207,8 @@ long function_parameter_struct_connect(
             {
                 PRINT_ERROR("snprintf error");
             }
-        }                
-    }    
+        }
+    }
 
     return(NBparamMAX);
 }
-
-
