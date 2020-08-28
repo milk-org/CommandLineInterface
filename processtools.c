@@ -11,11 +11,6 @@
  */
 
 
-#ifdef STANDALONE
-#define PROCESSINFO_ENABLED
-#endif
-
-
 #ifndef __STDC_LIB_EXT1__
 typedef int errno_t;
 #endif
@@ -259,9 +254,6 @@ PROCESSINFO *processinfo_setup(
     DEBUG_TRACEPOINT(" ");
 
 
-
-#ifdef PROCESSINFO_ENABLED
-
 #ifndef STANDALONE
 
     DEBUG_TRACEPOINT(" ");
@@ -313,9 +305,6 @@ PROCESSINFO *processinfo_setup(
     DEBUG_TRACEPOINT(" ");
 
 // Process signals are caught for suitable processing and reporting.
-    DEBUG_TRACEPOINT(" ");
-#endif
-    DEBUG_TRACEPOINT(" ");
     return processinfo;
 }
 
@@ -329,11 +318,9 @@ errno_t processinfo_error(
     PROCESSINFO *processinfo,
     char *errmsgstring
 ) {
-#ifdef PROCESSINFO_ENABLED
     processinfo->loopstat = 4; // ERROR
     processinfo_WriteMessage(processinfo, errmsgstring);
 	processinfo_cleanExit(processinfo);
-#endif
     return RETURN_SUCCESS;
 }
 
@@ -345,7 +332,6 @@ errno_t processinfo_error(
 errno_t processinfo_loopstart(
     PROCESSINFO *processinfo
 ) {
-#ifdef PROCESSINFO_ENABLED
     processinfo->loopcnt = 0;
     processinfo->loopstat = 1;
 
@@ -370,8 +356,6 @@ errno_t processinfo_loopstart(
 
 #endif // STANDALONE
 
-#endif
-
     return RETURN_SUCCESS;
 }
 
@@ -387,7 +371,6 @@ int processinfo_loopstep(
 {
     int loopstatus = 1;
 
-#ifdef PROCESSINFO_ENABLED
     while(processinfo->CTRLval == 1) { // pause
         usleep(50);
     }
@@ -413,8 +396,6 @@ int processinfo_loopstep(
             loopstatus = 0;
         }
 
-#endif
-
     return loopstatus;
 }
 
@@ -427,12 +408,10 @@ int processinfo_compute_status(
 ) {
     int compstatus = 1;
 
-#ifdef PROCESSINFO_ENABLED
         // CTRLval = 5 will disable computations in loop (usually for testing)
         if(processinfo->CTRLval == 5) {
             compstatus = 0;
         }
-#endif
 
     return compstatus;
 }
@@ -741,7 +720,6 @@ int processinfo_shm_close(PROCESSINFO *pinfo, int fd){
 
 
 int processinfo_cleanExit(PROCESSINFO *processinfo) {
-#ifdef PROCESSINFO_ENABLED
 
     if(processinfo->loopstat != 4) {
         struct timespec tstop;
@@ -764,7 +742,6 @@ int processinfo_cleanExit(PROCESSINFO *processinfo) {
         processinfo->loopstat = 3; // clean exit
     }
 
-#endif
     return 0;
 }
 
@@ -961,7 +938,6 @@ int processinfo_WriteMessage(
     PROCESSINFO *processinfo,
     const char  *msgstring
 ) {
-#ifdef PROCESSINFO_ENABLED
     struct timespec tnow;
     struct tm *tmnow;
 
@@ -983,7 +959,6 @@ int processinfo_WriteMessage(
 
     DEBUG_TRACEPOINT(" ");
     fflush(processinfo->logFile);
-#endif
     return 0;
 }
 
@@ -1027,51 +1002,37 @@ int processinfo_ProcessSignals(PROCESSINFO *processinfo) {
 #ifndef STANDALONE
     if(data.signal_TERM == 1) {
         loopOK = 0;
-#ifdef PROCESSINFO_ENABLED
         processinfo_SIGexit(processinfo, SIGTERM);
-#endif
     }
 
     if(data.signal_INT == 1) {
         loopOK = 0;
-#ifdef PROCESSINFO_ENABLED
         processinfo_SIGexit(processinfo, SIGINT);
-#endif
     }
 
     if(data.signal_ABRT == 1) {
         loopOK = 0;
-#ifdef PROCESSINFO_ENABLED
         processinfo_SIGexit(processinfo, SIGABRT);
-#endif
     }
 
     if(data.signal_BUS == 1) {
         loopOK = 0;
-#ifdef PROCESSINFO_ENABLED
         processinfo_SIGexit(processinfo, SIGBUS);
-#endif
     }
 
     if(data.signal_SEGV == 1) {
         loopOK = 0;
-#ifdef PROCESSINFO_ENABLED
         processinfo_SIGexit(processinfo, SIGSEGV);
-#endif
     }
 
     if(data.signal_HUP == 1) {
         loopOK = 0;
-#ifdef PROCESSINFO_ENABLED
         processinfo_SIGexit(processinfo, SIGHUP);
-#endif
     }
 
     if(data.signal_PIPE == 1) {
         loopOK = 0;
-#ifdef PROCESSINFO_ENABLED
         processinfo_SIGexit(processinfo, SIGPIPE);
-#endif
     }
 #endif
 
@@ -1390,7 +1351,6 @@ errno_t processinfo_update_output_stream(
 
 
 int processinfo_exec_start(PROCESSINFO *processinfo) {
-#ifdef PROCESSINFO_ENABLED
     if(processinfo->MeasureTiming == 1) {
 
         processinfo->timerindex ++;
@@ -1448,7 +1408,6 @@ int processinfo_exec_start(PROCESSINFO *processinfo) {
             }
         }
     }
-#endif
     return 0;
 }
 
@@ -1456,7 +1415,6 @@ int processinfo_exec_start(PROCESSINFO *processinfo) {
 
 int processinfo_exec_end(PROCESSINFO *processinfo) {
     int loopOK = 1;
-#ifdef PROCESSINFO_ENABLED
     if(processinfo->MeasureTiming == 1) {
         clock_gettime(CLOCK_REALTIME, &processinfo->texecend[processinfo->timerindex]);
 
@@ -1510,7 +1468,6 @@ int processinfo_exec_end(PROCESSINFO *processinfo) {
 
     loopOK = processinfo_ProcessSignals(processinfo);
     processinfo->loopcnt++;
-#endif
 
     return loopOK;  // returns 0 if signal stops loop
 }
