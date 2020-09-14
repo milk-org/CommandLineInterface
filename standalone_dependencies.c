@@ -25,22 +25,6 @@ int C_ERRNO = 0;
 /*                                         DUPLICATED CODE */
 /* ===============================================================================================
  */
-struct timespec timespec_diff(struct timespec start, struct timespec end)
-{
-    struct timespec temp;
-    if((end.tv_nsec - start.tv_nsec) < 0)
-    {
-        temp.tv_sec = end.tv_sec - start.tv_sec - 1;
-        temp.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
-    }
-    else
-    {
-        temp.tv_sec = end.tv_sec - start.tv_sec;
-        temp.tv_nsec = end.tv_nsec - start.tv_nsec;
-    }
-    return temp;
-}
-
 int print_header(const char *str, char c)
 {
     long n;
@@ -302,32 +286,6 @@ int is_fits_file(const char *restrict file_name)
     return(exists);
 }
 
-errno_t mkUTtimestring_microsec(char *timestring, struct timespec tnow)
-{
-	struct tm *uttime;
-    time_t tvsec0;
-
-
-    tvsec0 = tnow.tv_sec;
-    uttime = gmtime(&tvsec0);
-
-    sprintf(timestring, "%04d%02d%02dT%02d%02d%02d.%06ldZ",
-            1900 + uttime->tm_year, 1 + uttime->tm_mon, uttime->tm_mday, uttime->tm_hour,
-            uttime->tm_min,  uttime->tm_sec, (long) (tnow.tv_nsec/1000));
-
-
-    return RETURN_SUCCESS;
-}
-
-errno_t mkUTtimestring_microsec_now(char *timestring)
-{
-    struct timespec tnow;
-
-    clock_gettime(CLOCK_REALTIME, &tnow);
-    mkUTtimestring_microsec(timestring, tnow);
-
-    return RETURN_SUCCESS;
-}
 
 /**
  * @brief Duplicated code from MILK/COREMOD_memory fps_create.c
