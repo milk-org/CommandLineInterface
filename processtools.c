@@ -2221,6 +2221,10 @@ int processinfo_CPUsets_List(STRINGLISTENTRY *CPUsetList)
 
 	// first scan: get number of entries
 	fp = fopen("_tmplist.txt", "r");
+    if(fp == NULL) {
+        // if cset is not installed
+        return NBset;
+    }
 	while ( NBset < NBsetMax ) {
         if (fgets(line, 199, fp) == NULL) break;
         NBset++;
