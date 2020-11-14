@@ -438,7 +438,6 @@ int processinfo_compute_status(
  *
  *
  */
-
 long processinfo_shm_list_create()
 {
     char  SM_fname[STRINGMAXLEN_FULLFILENAME];
@@ -530,8 +529,14 @@ long processinfo_shm_list_create()
  * The structure holds real-time information about a process, so its status can be monitored and controlled
  * See structure PROCESSINFO in CLLIcore.h for details
  *
-*/
-
+ * @param pname : name of the Process Info object (human-readable)
+ * @param CTRLval : control value to be externally written.
+ *                 - 0: run                     (default)
+ *                 - 1: pause
+ *                 - 2: increment single step (will go back to 1)
+ *                 - 3: exit loop
+ * @return int : error code
+ */
 PROCESSINFO *processinfo_shm_create(
     const char *pname,
     int CTRLval
@@ -684,7 +689,16 @@ PROCESSINFO *processinfo_shm_create(
 }
 
 
-
+/**
+ * Link an existing PROCESSINFO structure in shared memory
+ *
+ * The structure holds real-time information about a process, so its status can be monitored and controlled
+ * See structure PROCESSINFO in CLLIcore.h for details
+ *
+ * @param PROCESSINFO* : PROCESSINFO structure to link
+ * @param pname : name of the PROCESSINFO structure (human-readable)
+ * @return int : error code
+ */
 PROCESSINFO *processinfo_shm_link(const char *pname, int *fd){
     struct stat file_stat;
 
@@ -718,7 +732,12 @@ int processinfo_shm_close(PROCESSINFO *pinfo, int fd){
 
 
 
-
+/**
+ * @brief Close an existing PROCESSINFO structure in shared memory
+ *
+ * @param PROCESSINFO* : PROCESSINFO structure to close
+ * @return int : error code
+ */
 int processinfo_cleanExit(PROCESSINFO *processinfo) {
 
     if(processinfo->loopstat != 4) {
@@ -749,7 +768,12 @@ int processinfo_cleanExit(PROCESSINFO *processinfo) {
 
 
 
-
+/**
+ * @brief Send a signal to a PROCESSINFO structure
+ *
+ * @param sig : signal to send
+ * @return int : error code
+ */
 int processinfo_SIGexit(PROCESSINFO *processinfo, int SignalNumber)
 {
     char       timestring[200];
@@ -933,7 +957,13 @@ int processinfo_SIGexit(PROCESSINFO *processinfo, int SignalNumber)
 
 
 
-
+/**
+ * @brief Write a message into a PROCESSINFO structure
+ *
+ * @param PROCESSINFO* : PROCESSINFO structure
+ * @param message : message to write
+ * @return int : error code
+ */
 int processinfo_WriteMessage(
     PROCESSINFO *processinfo,
     const char  *msgstring
@@ -1053,6 +1083,11 @@ int processinfo_ProcessSignals(PROCESSINFO *processinfo) {
  * The standard option should be tiggermode = PROCESSINFO_TRIGGERMODE_SEMAPHORE
  * and semindex = -1, which will automatically find a suitable semaphore
  *
+ * @param processinfo
+ * @param trigID
+ * @param triggermode
+ * @param semindexrequested
+ * @return errno_t
  */
 errno_t processinfo_waitoninputstream_init(
 	PROCESSINFO *processinfo,
@@ -1132,8 +1167,9 @@ errno_t processinfo_waitoninputstream_init(
 
 /** @brief Wait on a stream
  *
+ * @param processinfo
+ * @return errno_t
  */
-
 errno_t processinfo_waitoninputstream(
     PROCESSINFO *processinfo
 )
