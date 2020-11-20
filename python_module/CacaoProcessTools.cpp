@@ -22,6 +22,18 @@ PYBIND11_MODULE(CacaoProcessTools, m) {
         R"pbdoc(Open the function parameter monitor
 )pbdoc");
 
+  py::enum_<FPS_status>(m, "FPS_status")
+      .value("CONF", FPS_status::CONF)
+      .value("RUN", FPS_status::RUN)
+      .value("CMDCONF", FPS_status::CMDCONF)
+      .value("CMDRUN", FPS_status::CMDRUN)
+      .value("RUNLOOP", FPS_status::RUNLOOP)
+      .value("CHECKOK", FPS_status::CHECKOK)
+      .value("TMUXCONF", FPS_status::TMUXCONF)
+      .value("TMUXRUN", FPS_status::TMUXRUN)
+      .value("TMUXCTRL", FPS_status::TMUXCTRL)
+      .export_values();
+
   py::class_<timespec>(m, "timespec")
       .def(py::init<time_t, long>())
       .def_readwrite("tv_sec", &timespec::tv_sec)
@@ -199,6 +211,8 @@ Parameters:
            py::arg("name"), py::arg("create"),
            py::arg("NBparamMAX") = FUNCTION_PARAMETER_NBPARAM_DEFAULT)
 
+      .def("md", &pyFps::md)
+
       .def("add_entry", &pyFps::add_entry,
            R"pbdoc(Add parameter to database with default settings
 
@@ -336,9 +350,123 @@ Return:
 
       .def_property_readonly("keys", [](const pyFps &cls) { return cls.keys; })
 
-#ifdef VERSION_INFO
-      .attr("__version__") = VERSION_INFO;
-#else
-      .attr("__version__") = "dev";
-#endif
+      .def(
+          "CONFstart",
+          [](pyFps &cls) { return functionparameter_CONFstart(&cls.fps); },
+          R"pbdoc(FPS start CONF process
+
+Requires setup performed by milk-fpsinit, which performs the following setup
+- creates the FPS shared memory
+- create up tmux sessions
+- create function fpsrunstart, fpsrunstop, fpsconfstart and fpsconfstop
+
+Return:
+    ret      [out]: error code
+)pbdoc")
+
+      .def(
+          "CONFstop",
+          [](pyFps &cls) { return functionparameter_CONFstop(&cls.fps); },
+          R"pbdoc(FPS stop CONF process
+
+Return:
+    ret      [out]: error code
+)pbdoc")
+
+      .def(
+          "CONFupdate",
+          [](pyFps &cls) { return functionparameter_CONFupdate(&cls.fps); },
+          R"pbdoc(FPS update CONF process
+
+Return:
+    ret      [out]: error code
+)pbdoc")
+
+      .def(
+          "RUNstart",
+          [](pyFps &cls) { return functionparameter_RUNstart(&cls.fps); },
+          R"pbdoc(FPS start RUN process
+
+Requires setup performed by milk-fpsinit, which performs the following setup
+- creates the FPS shared memory
+- create up tmux sessions
+- create function fpsrunstart, fpsrunstop, fpsconfstart and fpsconfstop
+
+Return:
+    ret      [out]: error code
+)pbdoc")
+
+      .def(
+          "RUNstop",
+          [](pyFps &cls) { return functionparameter_RUNstop(&cls.fps); },
+          R"pbdoc(FPS stop RUN process
+
+ Run pre-set function fpsrunstop in tmux ctrl window
+
+Return:
+    ret      [out]: error code
+)pbdoc")
+
+      .def(
+          "RUNexit",
+          [](pyFps &cls) { return function_parameter_RUNexit(&cls.fps); },
+          R"pbdoc(FPS exit RUN process
+
+Return:
+    ret      [out]: error code
+)pbdoc")
+
+      .def_property_readonly("running",
+                             [](pyFps &cls) {
+                               pid_t pid = cls.md()->confpid;
+                               if ((getpgid(pid) >= 0) && (pid > 0)) {
+                                 return true;
+                               } else  // PID not active
+                               {
+                                 return false;
+                               }
+                             })
+
+      ;
+  py::class_<FUNCTION_PARAMETER_STRUCT_MD>(m, "FPS_md")
+      // .def(py::init([]() {
+      //     return std::unique_ptr<FUNCTION_PARAMETER_STRUCT_MD>(new
+      //     FUNCTION_PARAMETER_STRUCT_MD());
+      // }))
+      .def_readonly("name", &FUNCTION_PARAMETER_STRUCT_MD::name)
+      .def_readonly("description",
+                             &FUNCTION_PARAMETER_STRUCT_MD::description)
+      .def_readonly("workdir", &FUNCTION_PARAMETER_STRUCT_MD::workdir)
+      .def_readonly("datadir", &FUNCTION_PARAMETER_STRUCT_MD::datadir)
+      .def_readonly("confdir", &FUNCTION_PARAMETER_STRUCT_MD::confdir)
+      .def_readonly("sourcefname",
+                             &FUNCTION_PARAMETER_STRUCT_MD::sourcefname)
+      .def_readonly("sourceline",
+                             &FUNCTION_PARAMETER_STRUCT_MD::sourceline)
+      .def_readonly("pname", &FUNCTION_PARAMETER_STRUCT_MD::pname)
+      .def_readonly("callprogname",
+                             &FUNCTION_PARAMETER_STRUCT_MD::callprogname)
+    //   .def_readonly("nameindexW",
+                            //  &FUNCTION_PARAMETER_STRUCT_MD::nameindexW)
+      .def_readonly("NBnameindex",
+                             &FUNCTION_PARAMETER_STRUCT_MD::NBnameindex)
+      .def_readonly("confpid", &FUNCTION_PARAMETER_STRUCT_MD::confpid)
+      .def_readonly("confpidstarttime",
+                             &FUNCTION_PARAMETER_STRUCT_MD::confpidstarttime)
+      .def_readonly("runpid", &FUNCTION_PARAMETER_STRUCT_MD::runpid)
+      .def_readonly("runpidstarttime",
+                             &FUNCTION_PARAMETER_STRUCT_MD::runpidstarttime)
+      .def_readonly("signal", &FUNCTION_PARAMETER_STRUCT_MD::signal)
+      .def_readonly("confwaitus",
+                             &FUNCTION_PARAMETER_STRUCT_MD::confwaitus)
+      .def_readonly("status", &FUNCTION_PARAMETER_STRUCT_MD::status)
+      .def_readonly("NBparamMAX",
+                             &FUNCTION_PARAMETER_STRUCT_MD::NBparamMAX)
+    //   .def_readonly("message", &FUNCTION_PARAMETER_STRUCT_MD::message)
+      .def_readonly("msgpindex",
+                             &FUNCTION_PARAMETER_STRUCT_MD::msgpindex)
+      .def_readonly("msgcode", &FUNCTION_PARAMETER_STRUCT_MD::msgcode)
+      .def_readonly("msgcnt", &FUNCTION_PARAMETER_STRUCT_MD::msgcnt)
+      .def_readonly("conferrcnt",
+                             &FUNCTION_PARAMETER_STRUCT_MD::conferrcnt);
 }

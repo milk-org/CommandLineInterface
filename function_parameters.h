@@ -663,6 +663,7 @@ extern "C" {
 #include "fps_checkparameter.h"
 #include "fps_CONFstart.h"
 #include "fps_CONFstop.h"
+#include "fps_CONFupdate.h"
 #include "fps_connectExternalFPS.h"
 #include "fps_connect.h"
 #include "fps_CTRLscreen.h"

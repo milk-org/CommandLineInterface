@@ -59,6 +59,7 @@ add_library(CLIcore
             fps_connectExternalFPS.c
             fps_CONFstart.c
             fps_CONFstop.c
+            fps_CONFupdate.c
             fps_CTRLscreen.c
             fps_disconnect.c
             fps_execFPScmd.c
@@ -199,6 +200,7 @@ install(FILES CLIcore.h
               fps_checkparameter.h
               fps_CONFstart.h
               fps_CONFstop.h
+              fps_CONFupdate.h
               fps_connect.h
               fps_connectExternalFPS.h
               fps_CTRLscreen.h
