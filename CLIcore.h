@@ -256,20 +256,11 @@ write_process_log();                                 \
  *
  */
 #ifndef STANDALONE
-#define EXECUTE_SYSTEM_COMMAND(...) do {                                   \
-char syscommandstring[STRINGMAXLEN_COMMAND];                               \
-int slen = snprintf(syscommandstring, STRINGMAXLEN_COMMAND, __VA_ARGS__);  \
-if(slen<1) {                                                               \
-    PRINT_ERROR("snprintf wrote <1 char");                                 \
-    abort();                                                               \
-}                                                                          \
-if(slen >= STRINGMAXLEN_COMMAND) {                                         \
-    PRINT_ERROR("snprintf string truncation");                             \
-    abort();                                                               \
-}                                                                          \
-data.retvalue = system(syscommandstring);                                  \
-} while(0)
+#define RET_VALUE data.retvalue
 #else
+#define RET_VALUE int retvalue
+#endif
+
 #define EXECUTE_SYSTEM_COMMAND(...) do {                                   \
 char syscommandstring[STRINGMAXLEN_COMMAND];                               \
 int slen = snprintf(syscommandstring, STRINGMAXLEN_COMMAND, __VA_ARGS__);  \
@@ -281,8 +272,8 @@ if(slen >= STRINGMAXLEN_COMMAND) {                                         \
     PRINT_ERROR("snprintf string truncation");                             \
     abort();                                                               \
 }                                                                          \
+RET_VALUE = system(syscommandstring);                                      \
 } while(0)
-#endif
 
 
 /**

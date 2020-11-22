@@ -415,17 +415,51 @@ Return:
 Return:
     ret      [out]: error code
 )pbdoc")
+      // Test if CONF process is running
 
-      .def_property_readonly("running",
-                             [](pyFps &cls) {
-                               pid_t pid = cls.md()->confpid;
-                               if ((getpgid(pid) >= 0) && (pid > 0)) {
-                                 return true;
-                               } else  // PID not active
-                               {
-                                 return false;
-                               }
-                             })
+      .def_property_readonly(
+          "CONFrunning",
+          [](pyFps &cls) {
+            pid_t pid = cls->md->confpid;
+            if ((getpgid(pid) >= 0) && (pid > 0)) {
+              return 1;
+            } else  // PID not active
+            {
+              if (cls->md->status & FUNCTION_PARAMETER_STRUCT_STATUS_CMDCONF) {
+                // not clean exit
+                return -1;
+              } else {
+                return 0;
+              }
+            }
+          },
+          R"pbdoc(Test if CONF process is running
+
+Return:
+    ret      [out]: CONF process is running or not
+)pbdoc")
+
+      .def_property_readonly(
+          "RUNrunning",
+          [](pyFps &cls) {
+            pid_t pid = cls->md->runpid;
+            if ((getpgid(pid) >= 0) && (pid > 0)) {
+              return 1;
+            } else  // PID not active
+            {
+              if (cls->md->status & FUNCTION_PARAMETER_STRUCT_STATUS_CMDRUN) {
+                // not clean exit
+                return -1;
+              } else {
+                return 0;
+              }
+            }
+          },
+          R"pbdoc(Test if RUN process is running
+
+Return:
+    ret      [out]: RUN process is running or not
+)pbdoc")
 
       ;
   py::class_<FUNCTION_PARAMETER_STRUCT_MD>(m, "FPS_md")
@@ -434,39 +468,30 @@ Return:
       //     FUNCTION_PARAMETER_STRUCT_MD());
       // }))
       .def_readonly("name", &FUNCTION_PARAMETER_STRUCT_MD::name)
-      .def_readonly("description",
-                             &FUNCTION_PARAMETER_STRUCT_MD::description)
+      .def_readonly("description", &FUNCTION_PARAMETER_STRUCT_MD::description)
       .def_readonly("workdir", &FUNCTION_PARAMETER_STRUCT_MD::workdir)
       .def_readonly("datadir", &FUNCTION_PARAMETER_STRUCT_MD::datadir)
       .def_readonly("confdir", &FUNCTION_PARAMETER_STRUCT_MD::confdir)
-      .def_readonly("sourcefname",
-                             &FUNCTION_PARAMETER_STRUCT_MD::sourcefname)
-      .def_readonly("sourceline",
-                             &FUNCTION_PARAMETER_STRUCT_MD::sourceline)
+      .def_readonly("sourcefname", &FUNCTION_PARAMETER_STRUCT_MD::sourcefname)
+      .def_readonly("sourceline", &FUNCTION_PARAMETER_STRUCT_MD::sourceline)
       .def_readonly("pname", &FUNCTION_PARAMETER_STRUCT_MD::pname)
-      .def_readonly("callprogname",
-                             &FUNCTION_PARAMETER_STRUCT_MD::callprogname)
-    //   .def_readonly("nameindexW",
-                            //  &FUNCTION_PARAMETER_STRUCT_MD::nameindexW)
-      .def_readonly("NBnameindex",
-                             &FUNCTION_PARAMETER_STRUCT_MD::NBnameindex)
+      .def_readonly("callprogname", &FUNCTION_PARAMETER_STRUCT_MD::callprogname)
+      //   .def_readonly("nameindexW",
+      //  &FUNCTION_PARAMETER_STRUCT_MD::nameindexW)
+      .def_readonly("NBnameindex", &FUNCTION_PARAMETER_STRUCT_MD::NBnameindex)
       .def_readonly("confpid", &FUNCTION_PARAMETER_STRUCT_MD::confpid)
       .def_readonly("confpidstarttime",
-                             &FUNCTION_PARAMETER_STRUCT_MD::confpidstarttime)
+                    &FUNCTION_PARAMETER_STRUCT_MD::confpidstarttime)
       .def_readonly("runpid", &FUNCTION_PARAMETER_STRUCT_MD::runpid)
       .def_readonly("runpidstarttime",
-                             &FUNCTION_PARAMETER_STRUCT_MD::runpidstarttime)
+                    &FUNCTION_PARAMETER_STRUCT_MD::runpidstarttime)
       .def_readonly("signal", &FUNCTION_PARAMETER_STRUCT_MD::signal)
-      .def_readonly("confwaitus",
-                             &FUNCTION_PARAMETER_STRUCT_MD::confwaitus)
+      .def_readonly("confwaitus", &FUNCTION_PARAMETER_STRUCT_MD::confwaitus)
       .def_readonly("status", &FUNCTION_PARAMETER_STRUCT_MD::status)
-      .def_readonly("NBparamMAX",
-                             &FUNCTION_PARAMETER_STRUCT_MD::NBparamMAX)
-    //   .def_readonly("message", &FUNCTION_PARAMETER_STRUCT_MD::message)
-      .def_readonly("msgpindex",
-                             &FUNCTION_PARAMETER_STRUCT_MD::msgpindex)
+      .def_readonly("NBparamMAX", &FUNCTION_PARAMETER_STRUCT_MD::NBparamMAX)
+      //   .def_readonly("message", &FUNCTION_PARAMETER_STRUCT_MD::message)
+      .def_readonly("msgpindex", &FUNCTION_PARAMETER_STRUCT_MD::msgpindex)
       .def_readonly("msgcode", &FUNCTION_PARAMETER_STRUCT_MD::msgcode)
       .def_readonly("msgcnt", &FUNCTION_PARAMETER_STRUCT_MD::msgcnt)
-      .def_readonly("conferrcnt",
-                             &FUNCTION_PARAMETER_STRUCT_MD::conferrcnt);
+      .def_readonly("conferrcnt", &FUNCTION_PARAMETER_STRUCT_MD::conferrcnt);
 }
