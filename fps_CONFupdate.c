@@ -50,4 +50,5 @@ int functionparameter_CONFupdate(FUNCTION_PARAMETER_STRUCT *fps) {
       looptry = 0;
     }
   }
+  return EXIT_SUCCESS;
 }

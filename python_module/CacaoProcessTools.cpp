@@ -211,7 +211,7 @@ Parameters:
            py::arg("name"), py::arg("create"),
            py::arg("NBparamMAX") = FUNCTION_PARAMETER_NBPARAM_DEFAULT)
 
-      .def("md", &pyFps::md)
+      .def("md", &pyFps::md, py::return_value_policy::reference)
 
       .def("add_entry", &pyFps::add_entry,
            R"pbdoc(Add parameter to database with default settings
